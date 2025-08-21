@@ -1,17 +1,22 @@
 'use client';
-import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { Revenue } from '@/app/lib/definitions';
 
-export default function RevenueChart({ revenue }: { revenue: Revenue[] }) {
+type Props = {
+  revenue: Revenue[];
+};
+
+export default function RevenueChart({ revenue }: Props) {
   const chartHeight = 350;
 
   if (!revenue || revenue.length === 0) {
     return <p className="mt-4 text-gray-400">No data available.</p>;
   }
 
-  const { yAxisLabels, topLabel } = generateYAxis(revenue);
+  // Cari nilai maksimal untuk scaling bar
+  const topLabel = Math.max(...revenue.map((r) => r.revenue), 1); // minimal 1 agar tidak 0
+  const yAxisLabels = [topLabel, Math.floor(topLabel * 0.75), Math.floor(topLabel * 0.5), Math.floor(topLabel * 0.25), 0];
 
   return (
     <div className="w-full md:col-span-4">
@@ -37,6 +42,7 @@ export default function RevenueChart({ revenue }: { revenue: Revenue[] }) {
                 className="w-full rounded-md bg-blue-300"
                 style={{
                   height: `${(chartHeight / topLabel) * month.revenue}px`,
+                  minHeight: '2px', // supaya terlihat walau kecil
                 }}
               ></div>
               <p className="-rotate-90 text-sm text-gray-400 sm:rotate-0">

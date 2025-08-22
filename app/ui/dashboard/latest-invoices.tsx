@@ -2,13 +2,14 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
-import { fetchLatestInvoices } from '@/app/lib/data';
+import { LatestInvoiceRaw } from '@/app/types'; // pastikan tipe ini ada
 
-export default async function LatestInvoices() {
-  // Fetch data sendiri
-  const latestInvoices = await fetchLatestInvoices();
+interface LatestInvoicesProps {
+  invoices: LatestInvoiceRaw[];
+}
 
-  if (!latestInvoices || latestInvoices.length === 0) {
+export default function LatestInvoices({ invoices }: LatestInvoicesProps) {
+  if (!invoices || invoices.length === 0) {
     return (
       <div className="flex w-full flex-col md:col-span-4">
         <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -20,7 +21,7 @@ export default async function LatestInvoices() {
   }
 
   // Filter duplicate invoices berdasarkan id
-  const uniqueInvoices = latestInvoices.filter(
+  const uniqueInvoices = invoices.filter(
     (invoice, index, self) =>
       index === self.findIndex((i) => i.id === invoice.id)
   );

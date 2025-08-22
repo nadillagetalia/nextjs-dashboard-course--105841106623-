@@ -111,7 +111,7 @@ export async function fetchFilteredInvoices(query: string, currentPage: number) 
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 
-    // Pastikan amount dikonversi ke USD untuk form edit
+    // Konversi amount dari cents ke USD untuk tampilan/edit form
     return invoices.map((inv) => ({ ...inv, amount: Number(inv.amount) / 100 }));
   } catch (error) {
     console.error('Database Error (fetchFilteredInvoices):', error);
@@ -154,12 +154,11 @@ export async function fetchInvoiceById(id: string): Promise<InvoiceForm | null> 
     `;
     if (!data || data.length === 0) return null;
 
-    // konversi amount dari cents ke USD
+    // Konversi amount dari cents ke USD
     return {
       ...data[0],
       amount: Number(data[0].amount) / 100,
     };
-    return invoice[0];
   } catch (error) {
     console.error('Database Error (fetchInvoiceById):', error);
     return null;
@@ -208,8 +207,8 @@ export async function fetchFilteredCustomers(query: string): Promise<CustomersTa
 
     return data.map((customer) => ({
       ...customer,
-      total_pending: formatCurrency(Number(customer.total_pending ?? 0)),
-      total_paid: formatCurrency(Number(customer.total_paid ?? 0)),
+      total_pending: Number(customer.total_pending ?? 0),
+      total_paid: Number(customer.total_paid ?? 0),
     }));
   } catch (error) {
     console.error('Database Error (fetchFilteredCustomers):', error);

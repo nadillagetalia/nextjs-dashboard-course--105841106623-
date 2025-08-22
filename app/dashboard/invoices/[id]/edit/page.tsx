@@ -4,11 +4,11 @@ import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: Promise<{ id: string }>; // ✅ sesuai Next.js App Router type
+  params: { id: string };
 }
 
 export default async function EditInvoicePage({ params }: PageProps) {
-  const { id } = await params; // ✅ tunggu params karena sekarang berupa Promise
+  const { id } = params; // ✅ langsung akses, tidak pakai await
 
   const [invoice, customers] = await Promise.all([
     fetchInvoiceById(id),

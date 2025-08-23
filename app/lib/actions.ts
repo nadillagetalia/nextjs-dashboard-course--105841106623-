@@ -143,18 +143,19 @@ export async function deleteInvoice(id: string): Promise<State> {
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData
-): Promise<string | void> {
+): Promise<string | undefined> {
   try {
     await signIn('credentials', formData);
+    return undefined; // ✅ Berikan explicit return undefined jika sukses
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid credentials.';
+          return 'Invalid credentials.'; // ✅ return string kalau gagal
         default:
           return 'Something went wrong.';
       }
     }
-    throw error;
+    throw error; // tetap lempar error kalau bukan AuthError
   }
 }

@@ -6,19 +6,25 @@ import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { updateInvoice, State } from '@/app/lib/actions';
 import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 
 interface Props {
   invoice: InvoiceForm;
   customers: CustomerField[];
 }
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? 'Updating...' : 'Update Invoice'}
+    </Button>
+  );
+}
+
 export default function EditInvoiceForm({ invoice, customers }: Props) {
   const initialState: State = { message: null, errors: {} };
-
-  // Bind invoice.id sebagai parameter pertama (prevState nanti akan diteruskan otomatis)
   const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
-
-  // Gunakan useActionState untuk form submission
   const [state, formAction] = useActionState(updateInvoiceWithId, initialState);
 
   return (
@@ -107,9 +113,7 @@ export default function EditInvoiceForm({ invoice, customers }: Props) {
         >
           Cancel
         </Link>
-        <Button type="submit" disabled={state.isPending}>
-          {state.isPending ? 'Updating...' : 'Update Invoice'}
-        </Button>
+        <SubmitButton />
       </div>
     </form>
   );

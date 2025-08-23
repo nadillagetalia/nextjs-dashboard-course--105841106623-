@@ -74,6 +74,7 @@ export type FormattedCustomersTable = {
   total_invoices: number;
   total_pending: string;
   total_paid: string;
+  status?: 'pending' | 'paid'; // tambahkan ini kalau memang mau pakai status
 };
 
 export type CustomerField = {

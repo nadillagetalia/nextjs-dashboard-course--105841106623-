@@ -27,11 +27,13 @@ export function UpdateInvoice({ id }: { id: string }) {
 }
 
 export function DeleteInvoice({ id }: { id: string }) {
-  // Bind the id to the server action
-  const deleteInvoiceWithId = deleteInvoice.bind(null, id);
-
   return (
-    <form action={deleteInvoiceWithId}>
+    <form
+      action={async (formData: FormData) => {
+        await deleteInvoice(formData.get('id') as string);
+      }}
+    >
+      <input type="hidden" name="id" value={id} />
       <button
         type="submit"
         className="rounded-md border p-2 hover:bg-gray-100"

@@ -1,4 +1,5 @@
 'use server';
+
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
@@ -9,7 +10,7 @@ import postgres from 'postgres';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 // --------------------
-// Zod schema
+// Zod Schema
 // --------------------
 const FormSchema = z.object({
   id: z.string(),
@@ -27,7 +28,7 @@ const CreateInvoiceSchema = FormSchema.omit({ id: true, date: true });
 const UpdateInvoiceSchema = FormSchema.omit({ id: true, date: true });
 
 // --------------------
-// Type State
+// State Type
 // --------------------
 export type State = {
   errors?: {
@@ -41,7 +42,10 @@ export type State = {
 // --------------------
 // Create Invoice
 // --------------------
-export async function createInvoice(prevState: State, formData: FormData): Promise<State | void> {
+export async function createInvoice(
+  prevState: State,
+  formData: FormData
+): Promise<State> {
   const validatedFields = CreateInvoiceSchema.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -70,12 +74,18 @@ export async function createInvoice(prevState: State, formData: FormData): Promi
 
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
+
+  return { message: null, errors: {} }; // Tidak akan dieksekusi, tapi diperlukan untuk tipe
 }
 
 // --------------------
 // Update Invoice
 // --------------------
-export async function updateInvoice(id: string, prevState: State, formData: FormData): Promise<State | void> {
+export async function updateInvoice(
+  id: string,
+  prevState: State,
+  formData: FormData
+): Promise<State> {
   const validatedFields = UpdateInvoiceSchema.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
@@ -105,12 +115,14 @@ export async function updateInvoice(id: string, prevState: State, formData: Form
 
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
+
+  return { message: null, errors: {} };
 }
 
 // --------------------
 // Delete Invoice
 // --------------------
-export async function deleteInvoice(id: string): Promise<State | void> {
+export async function deleteInvoice(id: string): Promise<State> {
   try {
     await sql`
       DELETE FROM invoices
@@ -122,11 +134,16 @@ export async function deleteInvoice(id: string): Promise<State | void> {
   }
 
   revalidatePath('/dashboard/invoices');
+  return { message: null, errors: {} };
 }
+
+// --------------------
+// Authenticate User
+// --------------------
 export async function authenticate(
   prevState: string | undefined,
-  formData: FormData,
-) {
+  formData: FormData
+): Promise<string | void> {
   try {
     await signIn('credentials', formData);
   } catch (error) {
